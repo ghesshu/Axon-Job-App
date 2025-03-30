@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/Axon-Job-App.props" />
+</Project>

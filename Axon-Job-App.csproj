@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Axon_Job_App</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+   <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+    <PackageReference Include="cai.analyzers" Version="0.10.6" />
+    <PackageReference Include="cai.abstractions" Version="0.20.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.7.0" />
+    <PackageReference Include="HotChocolate.Data" Version="13.7.0" />
+    <PackageReference Include="HotChocolate.Types" Version="13.7.0" />
+    <!-- <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" /> -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
+     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
+    <PackageReference Include="WolverineFx" Version="2.1.2" />
+  </ItemGroup>
+
+</Project>

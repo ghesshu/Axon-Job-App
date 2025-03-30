@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "NbMPpQ4nEJ+765tRPfxJ/QpN+RIzZbcSnh7a+sEu4z4=",
+  "Source": "Axon-Job-App",
+  "BasePath": "_content/Axon-Job-App",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
