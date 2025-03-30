@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Axon-Job-App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6756f94df49f3b6581c5d9da67f446d74c9e6330")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c5c73eec887d58c5662d7a1eb00c6fdc0b378089")]
 [assembly: System.Reflection.AssemblyProductAttribute("Axon-Job-App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Axon-Job-App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
