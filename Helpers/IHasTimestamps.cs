@@ -1,4 +1,4 @@
-namespace axon_final_api.Helpers;
+namespace Axon_Job_App.Helpers;
 
 public interface IHasTimestamps
 {

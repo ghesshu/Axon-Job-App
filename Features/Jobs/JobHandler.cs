@@ -1,8 +1,8 @@
-using axon_final_api.Common;
-using axon_final_api.Data;
-using axon_final_api.Features.Clients;
+using Axon_Job_App.Common;
+using Axon_Job_App.Data;
+using Axon_Job_App.Features.Clients;
 
-namespace axon_final_api.Features.Jobs;
+namespace Axon_Job_App.Features.Jobs;
 
 public class JobHandler
 {

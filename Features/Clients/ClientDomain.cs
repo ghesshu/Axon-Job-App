@@ -1,6 +1,6 @@
 using System;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public record ClientResponse(
     long Id,

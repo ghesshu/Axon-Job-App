@@ -1,6 +1,6 @@
 using System;
 
-namespace axon_final_api.Common.Extensions;
+namespace Axon_Job_App.Common.Extensions;
 
 public static class LoggerExtension
 {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace axon_final_api.Features.Users;
+namespace Axon_Job_App.Features.Users;
 
 // Login DTOs
 public record LoginRequest(

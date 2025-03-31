@@ -1,4 +1,4 @@
-namespace axon_final_api.Features.Candidates;
+namespace Axon_Job_App.Features.Candidates;
 
 public record CreateCandidateRequest(
     string Name,

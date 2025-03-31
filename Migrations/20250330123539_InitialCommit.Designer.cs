@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using axon_final_api.Data;
+using Axon_Job_App.Data;
 
 #nullable disable
 
@@ -20,7 +20,7 @@ namespace Axon_Job_App.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
 
-            modelBuilder.Entity("axon_final_api.Features.Candidates.Candidate", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Candidates.Candidate", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Candidates");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Clients.Client", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Clients.Client", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +105,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Jobs.Job", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Jobs.Job", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,7 +181,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Jobs");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Jobs.JobAssignment", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Jobs.JobAssignment", b =>
                 {
                     b.Property<long>("JobId")
                         .HasColumnType("INTEGER");
@@ -203,7 +203,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("JobAssignments");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.Permission", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.Permission", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(100)
@@ -218,7 +218,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.Role", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.Role", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -251,7 +251,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.RolePermission", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.RolePermission", b =>
                 {
                     b.Property<long>("RoleId")
                         .HasColumnType("INTEGER");
@@ -267,7 +267,7 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("RolePermissions");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.User", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -303,9 +303,9 @@ namespace Axon_Job_App.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Jobs.Job", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Jobs.Job", b =>
                 {
-                    b.HasOne("axon_final_api.Features.Clients.Client", "Client")
+                    b.HasOne("Axon_Job_App.Features.Clients.Client", "Client")
                         .WithMany("Jobs")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -314,15 +314,15 @@ namespace Axon_Job_App.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Jobs.JobAssignment", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Jobs.JobAssignment", b =>
                 {
-                    b.HasOne("axon_final_api.Features.Candidates.Candidate", "Candidate")
+                    b.HasOne("Axon_Job_App.Features.Candidates.Candidate", "Candidate")
                         .WithMany("Assignments")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("axon_final_api.Features.Jobs.Job", "Job")
+                    b.HasOne("Axon_Job_App.Features.Jobs.Job", "Job")
                         .WithMany("Assignments")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -333,15 +333,15 @@ namespace Axon_Job_App.Migrations
                     b.Navigation("Job");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.RolePermission", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.RolePermission", b =>
                 {
-                    b.HasOne("axon_final_api.Features.Users.Permission", "Permission")
+                    b.HasOne("Axon_Job_App.Features.Users.Permission", "Permission")
                         .WithMany("RolePermissions")
                         .HasForeignKey("PermissionName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("axon_final_api.Features.Users.Role", "Role")
+                    b.HasOne("Axon_Job_App.Features.Users.Role", "Role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -352,9 +352,9 @@ namespace Axon_Job_App.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.User", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.User", b =>
                 {
-                    b.HasOne("axon_final_api.Features.Users.Role", "Role")
+                    b.HasOne("Axon_Job_App.Features.Users.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -363,27 +363,27 @@ namespace Axon_Job_App.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Candidates.Candidate", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Candidates.Candidate", b =>
                 {
                     b.Navigation("Assignments");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Clients.Client", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Clients.Client", b =>
                 {
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Jobs.Job", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Jobs.Job", b =>
                 {
                     b.Navigation("Assignments");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.Permission", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
                 });
 
-            modelBuilder.Entity("axon_final_api.Features.Users.Role", b =>
+            modelBuilder.Entity("Axon_Job_App.Features.Users.Role", b =>
                 {
                     b.Navigation("RolePermissions");
 

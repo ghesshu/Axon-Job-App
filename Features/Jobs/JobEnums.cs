@@ -1,4 +1,4 @@
-namespace axon_final_api.Features.Jobs;
+namespace Axon_Job_App.Features.Jobs;
 
 public enum JobStatus
 {

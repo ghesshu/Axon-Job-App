@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using axon_final_api.Common;
-using axon_final_api.Data;
+using Axon_Job_App.Common;
+using Axon_Job_App.Data;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public class ClientHandler
 {

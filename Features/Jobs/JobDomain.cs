@@ -1,7 +1,7 @@
 using System;
-using axon_final_api.Features.Jobs;
+using Axon_Job_App.Features.Jobs;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public record JobResponse(
     long Id,

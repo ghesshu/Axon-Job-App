@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using axon_final_api.Features.Candidates;
+using Axon_Job_App.Features.Candidates;
 
-using axon_final_api.Helpers;
+using Axon_Job_App.Helpers;
 
-namespace axon_final_api.Features.Jobs;
+namespace Axon_Job_App.Features.Jobs;
 
 public class Job : IHasTimestamps
 {
@@ -14,7 +14,7 @@ public class Job : IHasTimestamps
     [ForeignKey(nameof(Client))]
     public long ClientId { get; set; }
 
-    public virtual axon_final_api.Features.Clients.Client Client { get; set; } = null!;
+    public virtual Axon_Job_App.Features.Clients.Client Client { get; set; } = null!;
 
     [Required]
     public string Title { get; set; } = null!;
