@@ -16,6 +16,17 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddControllers();
 
+//Cors
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
