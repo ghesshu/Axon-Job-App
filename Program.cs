@@ -38,6 +38,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.MigrateDb();
 
 app.MapControllers();
