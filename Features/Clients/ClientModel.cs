@@ -24,8 +24,6 @@ public class Client : IHasTimestamps
     [Column(TypeName = "varchar(20)")]
     public string VerificationStatus { get; set; } = "pending";
 
-    public int NumberOfAttendingCandidates { get; set; } = 0;
-
      public virtual ICollection<Job> Jobs { get; set; } = [];
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
