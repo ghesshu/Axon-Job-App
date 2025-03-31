@@ -94,15 +94,22 @@ public class ClientHandler
     }
 
     public async Task<CallResult> Handle(
-        ClientMutation.DeleteClient command, 
-        DataContext db, 
-        CancellationToken cancellationToken)
+    ClientMutation.DeleteClient command, 
+    DataContext db, 
+    CancellationToken cancellationToken)
     {
         try
         {
-            var client = await db.Clients.FindAsync([command.Id], cancellationToken);
+            var client = await db.Clients
+                .Include(c => c.Jobs)
+                .FirstOrDefaultAsync(c => c.Id == command.Id, cancellationToken);
+            
             if (client == null)
                 return CallResult.error("Client not found");
+
+            // Check if client has any associated jobs
+            if (client.Jobs.Count != 0)
+                return CallResult.error("Client cannot be deleted because it has associated jobs");
 
             db.Clients.Remove(client);
             await db.SaveChangesAsync(cancellationToken);
