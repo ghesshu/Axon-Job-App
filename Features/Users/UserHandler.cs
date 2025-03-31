@@ -6,18 +6,19 @@ using Microsoft.AspNetCore.Identity;
 using static BCrypt.Net.BCrypt;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
+using Axon_Job_App.Services;
 
 namespace Axon_Job_App.Features.Users;
 
 public class UserHandler()
 {     
-    // private readonly AuthContext authContext = _authContext;
 
     // User handlers
     public async Task<CallResult<LoginResponse>> Handle(UserMutation.Login command, DataContext db,ILogger<UserHandler> logger, CancellationToken cancellationToken)
     {
        try
        {
+         
          var user = await db.Users
             .Include(u => u.Role)
             .ThenInclude(r => r!.RolePermissions)
@@ -60,7 +61,7 @@ public class UserHandler()
     {
        try
        {
-        //  await authContext.CheckRole(db, "Admin");
+        // await authContext.CheckRole(db, "Admin");
 
         var existingUser = await db.Users
             .FirstOrDefaultAsync(u => u.Email == command.Input.Email, cancellationToken);
@@ -95,9 +96,9 @@ public class UserHandler()
     {
        try
        {
-        //  await authContext.CheckRole(db, "Admin");
+        // await authContext.CheckRole(db, "Admin");
 
-        var user = await db.Users.FindAsync(new object?[] { command.Id }, cancellationToken: cancellationToken);
+        var user = await db.Users.FindAsync([command.Id], cancellationToken: cancellationToken);
         if (user == null)
             return CallResult<UserResponse>.error("User not found");
 
