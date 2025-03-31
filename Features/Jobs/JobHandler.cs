@@ -8,6 +8,25 @@ namespace Axon_Job_App.Features.Jobs;
 
 public class JobHandler
 {
+        private static JobResponse MapToResponse(Job job) => new(
+        job.Id,
+        job.ClientId,
+        job.Title,
+        job.JobType,
+        job.Status,
+        job.PaymentType,
+        job.SalaryPerAnnum,
+        job.Duties,
+        job.Requirements,
+        job.JobHours,
+        job.Location,
+        job.StartDate,
+        job.NumberOfRoles,
+        job.Published,
+        job.CreatedAt,
+        job.UpdatedAt
+    );
+
     public async Task<CallResult<JobResponse>> Handle(
         JobMutation.CreateJob command, 
         DataContext db, 
@@ -15,50 +34,28 @@ public class JobHandler
     {
         try
         {
-            var clientExists = await db.Clients.AnyAsync(c => c.Id == command.Input.ClientId, ct);
-            if (!clientExists)
+            if (!await db.Clients.AnyAsync(c => c.Id == command.Input.ClientId, ct))
                 return CallResult<JobResponse>.error("Client not found");
 
             var job = new Job
             {
                 ClientId = command.Input.ClientId,
                 Title = command.Input.Title,
-                TemporaryType = command.Input.TemporaryType,
                 JobType = command.Input.JobType,
                 PaymentType = command.Input.PaymentType,
-                PaymentAmount = command.Input.PaymentAmount,
-                Duties = command.Input.Duties,
-                Requirements = command.Input.Requirements,
+                SalaryPerAnnum = command.Input.SalaryPerAnnum,
+                Duties = command.Input.Duties[..Math.Min(command.Input.Duties.Length, 4)],
+                Requirements = command.Input.Requirements[..Math.Min(command.Input.Requirements.Length, 4)],
                 JobHours = command.Input.JobHours,
                 Location = command.Input.Location,
                 StartDate = command.Input.StartDate,
-                NumberOfRoles = command.Input.NumberOfRoles,
-                WorkingHours = command.Input.WorkingHours
+                NumberOfRoles = command.Input.NumberOfRoles
             };
 
-            db.Jobs.Add(job);
+            await db.Jobs.AddAsync(job, ct);
             await db.SaveChangesAsync(ct);
 
-            return CallResult<JobResponse>.ok(new JobResponse(
-                job.Id,
-                job.ClientId,
-                job.Title,
-                job.TemporaryType,
-                job.JobType,
-                job.Status,
-                job.PaymentType,
-                job.PaymentAmount,
-                job.Duties,
-                job.Requirements,
-                job.JobHours,
-                job.Location,
-                job.Published,
-                job.StartDate,
-                job.NumberOfRoles,
-                job.WorkingHours,
-                job.CreatedAt,
-                job.UpdatedAt
-            ), "Job created successfully");
+            return CallResult<JobResponse>.ok(MapToResponse(job), "Job created successfully");
         }
         catch (Exception e)
         {
@@ -73,72 +70,51 @@ public class JobHandler
     {
         try
         {
-            var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
+            var job = await db.Jobs.FindAsync([command.Id], ct);
             if (job == null)
                 return CallResult<JobResponse>.error("Job not found");
 
+            // Update properties
             if (!string.IsNullOrEmpty(command.Input.Title))
                 job.Title = command.Input.Title;
-
-            if (!string.IsNullOrEmpty(command.Input.TemporaryType))
-                job.TemporaryType = command.Input.TemporaryType;
-
+            
             if (command.Input.JobType.HasValue)
                 job.JobType = command.Input.JobType.Value;
-
+            
             if (command.Input.PaymentType.HasValue)
                 job.PaymentType = command.Input.PaymentType.Value;
-
-            if (command.Input.PaymentAmount.HasValue)
-                job.PaymentAmount = command.Input.PaymentAmount.Value;
-
+            
+            if (command.Input.SalaryPerAnnum.HasValue)
+                job.SalaryPerAnnum = command.Input.SalaryPerAnnum.Value;
+            
             if (command.Input.Duties != null)
-                job.Duties = command.Input.Duties;
-
+                job.Duties = command.Input.Duties[..Math.Min(command.Input.Duties.Length, 4)];
+            
             if (command.Input.Requirements != null)
-                job.Requirements = command.Input.Requirements;
-
+                job.Requirements = command.Input.Requirements[..Math.Min(command.Input.Requirements.Length, 4)];
+            
             if (!string.IsNullOrEmpty(command.Input.JobHours))
                 job.JobHours = command.Input.JobHours;
-
+            
             if (!string.IsNullOrEmpty(command.Input.Location))
                 job.Location = command.Input.Location;
-
-            if (command.Input.Published.HasValue)
-                job.Published = command.Input.Published.Value;
-
+            
             if (command.Input.StartDate.HasValue)
                 job.StartDate = command.Input.StartDate.Value;
-
+            
             if (command.Input.NumberOfRoles.HasValue)
                 job.NumberOfRoles = command.Input.NumberOfRoles.Value;
-
-            if (!string.IsNullOrEmpty(command.Input.WorkingHours))
-                job.WorkingHours = command.Input.WorkingHours;
+            
+            if (command.Input.Published.HasValue)
+            {
+                job.Published = command.Input.Published.Value;
+                job.Status = command.Input.Published.Value ? JobStatus.Published : JobStatus.Draft;
+            }
 
             job.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(ct);
 
-            return CallResult<JobResponse>.ok(new JobResponse(
-                job.Id,
-                job.ClientId,
-                job.Title,
-                job.TemporaryType,
-                job.JobType,
-                job.Status,
-                job.PaymentType,
-                job.PaymentAmount,
-                job.Duties,
-                job.Requirements,
-                job.JobHours,
-                job.Location,
-                job.Published,
-                job.StartDate,
-                job.NumberOfRoles,
-                job.WorkingHours,
-                job.CreatedAt,
-                job.UpdatedAt
-            ), "Job updated successfully");
+            return CallResult<JobResponse>.ok(MapToResponse(job), "Job updated successfully");
         }
         catch (Exception e)
         {
@@ -153,12 +129,22 @@ public class JobHandler
     {
         try
         {
-            var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
-            if (job == null)
+            // Check existence and assignments in single query
+            var jobInfo = await db.Jobs
+                .Where(j => j.Id == command.Id)
+                .Select(j => new { j.Id, AssignmentCount = j.Assignments.Count })
+                .FirstOrDefaultAsync(ct);
+
+            if (jobInfo == null)
                 return CallResult.error("Job not found");
 
-            db.Jobs.Remove(job);
-            await db.SaveChangesAsync(ct);
+            if (jobInfo.AssignmentCount > 0)
+                return CallResult.error("Cannot delete job with existing assignments");
+
+            // Use ExecuteDelete for better performance
+            await db.Jobs
+                .Where(j => j.Id == command.Id)
+                .ExecuteDeleteAsync(ct);
 
             return CallResult.ok("Job deleted successfully");
         }
@@ -175,13 +161,16 @@ public class JobHandler
     {
         try
         {
-            var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
-            if (job == null)
-                return CallResult.error("Job not found");
+            var updated = await db.Jobs
+                .Where(j => j.Id == command.Id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(j => j.Published, true)
+                    .SetProperty(j => j.Status, JobStatus.Published)
+                    .SetProperty(j => j.UpdatedAt, DateTime.UtcNow),
+                ct);
 
-            job.Published = true;
-            job.UpdatedAt = DateTime.UtcNow;
-            await db.SaveChangesAsync(ct);
+            if (updated == 0)
+                return CallResult.error("Job not found");
 
             return CallResult.ok("Job published successfully");
         }
@@ -190,7 +179,6 @@ public class JobHandler
             return CallResult.error(e.Message);
         }
     }
-
     public async Task<CallResult> Handle(
         JobMutation.AssignJob command, 
         DataContext db, 

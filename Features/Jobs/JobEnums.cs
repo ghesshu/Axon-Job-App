@@ -10,18 +10,18 @@ public enum JobStatus
 
 public enum JobType
 {
-    FullTime,
-    PartTime,
+    Permanent,
     Contract,
+    PartTime,
     Temporary,
     Internship
 }
 
 public enum PaymentType
 {
-    Hourly,
+    PerHour,
+    PerAnnum,
     Daily,
-    Weekly,
     Monthly,
     ProjectBased
 }
