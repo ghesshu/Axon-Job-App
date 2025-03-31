@@ -1,5 +1,6 @@
 using Axon_Job_App.Common;
 using Cai;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Axon_Job_App.Features.Users;
 
