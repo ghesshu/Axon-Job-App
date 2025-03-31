@@ -1,7 +1,7 @@
-using axon_final_api.Common;
+using Axon_Job_App.Common;
 using Cai;
 
-namespace axon_final_api.Features.Candidates;
+namespace Axon_Job_App.Features.Candidates;
 
 public class CandidateMutation
 {

@@ -1,9 +1,9 @@
-using axon_final_api.Common;
-using axon_final_api.Data;
+using Axon_Job_App.Common;
+using Axon_Job_App.Data;
 using Cai;
 using Microsoft.EntityFrameworkCore;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 [Queries]
 public partial class ClientQueries

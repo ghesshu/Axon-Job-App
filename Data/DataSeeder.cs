@@ -1,8 +1,8 @@
-using axon_final_api.Features.Users;
-using axon_final_api.Helpers;
+using Axon_Job_App.Features.Users;
+using Axon_Job_App.Helpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace axon_final_api.Data;
+namespace Axon_Job_App.Data;
 
 public class DataSeeder
 {

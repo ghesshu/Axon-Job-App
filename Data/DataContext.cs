@@ -1,13 +1,13 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
-using axon_final_api.Features.Users;
-using axon_final_api.Helpers;
-using axon_final_api.Features.Jobs;
-using axon_final_api.Features.Clients;
-using axon_final_api.Features.Candidates;
+using Axon_Job_App.Features.Users;
+using Axon_Job_App.Helpers;
+using Axon_Job_App.Features.Jobs;
+using Axon_Job_App.Features.Clients;
+using Axon_Job_App.Features.Candidates;
 
-namespace axon_final_api.Data;
+namespace Axon_Job_App.Data;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {

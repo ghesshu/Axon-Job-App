@@ -1,7 +1,7 @@
-using axon_final_api.Common;
+using Axon_Job_App.Common;
 using Cai;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public class ClientMutation
 {

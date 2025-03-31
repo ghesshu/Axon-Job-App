@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using axon_final_api.Common;
-using axon_final_api.Data;
+using Axon_Job_App.Common;
+using Axon_Job_App.Data;
 using Microsoft.AspNetCore.Identity;
 using static BCrypt.Net.BCrypt;
 using Microsoft.EntityFrameworkCore;
-using axon_final_api.Common.Extensions;
+using Axon_Job_App.Common.Extensions;
 
-namespace axon_final_api.Features.Users;
+namespace Axon_Job_App.Features.Users;
 
 public class UserHandler()
 {     

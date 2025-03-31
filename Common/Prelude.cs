@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace axon_final_api.Common;
+namespace Axon_Job_App.Common;
 
 public static class Prelude
 {
