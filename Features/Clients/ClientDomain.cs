@@ -9,7 +9,7 @@ public record ClientResponse(
     string CompanyLocation,
     DateTime DateJoined,
     string VerificationStatus,
-    int NumberOfAttendingCandidates,
+    // int NumberOfAttendingCandidates,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );
@@ -24,8 +24,8 @@ public record CreateClientRequest(
 public record UpdateClientRequest(
     string? CompanyName,
     string? CompanyImage,
-    string? CompanyLocation,
-    VerificationStatus? VerificationStatus
+    string? CompanyLocation
+    // VerificationStatus? VerificationStatus
 );
 
 public enum VerificationStatus
