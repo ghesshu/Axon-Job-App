@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using axon_final_api.Features.Jobs;
-using axon_final_api.Helpers;
+using Axon_Job_App.Features.Jobs;
+using Axon_Job_App.Helpers;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public class Client : IHasTimestamps
 {
@@ -23,8 +23,6 @@ public class Client : IHasTimestamps
     [Required]
     [Column(TypeName = "varchar(20)")]
     public string VerificationStatus { get; set; } = "pending";
-
-    public int NumberOfAttendingCandidates { get; set; } = 0;
 
      public virtual ICollection<Job> Jobs { get; set; } = [];
 

@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using axon_final_api.Helpers;
+using Axon_Job_App.Helpers;
 
-namespace axon_final_api.Features.Users;
+namespace Axon_Job_App.Features.Users;
 
 public class User : IHasTimestamps
 {

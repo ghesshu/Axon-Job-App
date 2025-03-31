@@ -1,9 +1,9 @@
-using axon_final_api.Common;
-using axon_final_api.Data;
+using Axon_Job_App.Common;
+using Axon_Job_App.Data;
 using Cai;
 using Microsoft.EntityFrameworkCore;
 
-namespace axon_final_api.Features.Users;
+namespace Axon_Job_App.Features.Users;
 
 [Queries]
 public partial class UserQueries

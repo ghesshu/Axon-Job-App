@@ -1,7 +1,8 @@
-using axon_final_api.Common;
+using Axon_Job_App.Common;
+using Axon_Job_App.Features.Clients;
 using Cai;
 
-namespace axon_final_api.Features.Clients;
+namespace Axon_Job_App.Features.Clients;
 
 public class ClientMutation
 {
@@ -15,5 +16,5 @@ public class ClientMutation
     public record DeleteClient(long Id);
 
     [Mutation<CallResult>]
-    public record UpdateClientVerificationStatus(long Id, string Status);
+    public record ClientVStatus(long Id, VerificationStatus Status);
 }

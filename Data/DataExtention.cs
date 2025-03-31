@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace axon_final_api.Data;
+namespace Axon_Job_App.Data;
 
 public static class DataExtention
 {

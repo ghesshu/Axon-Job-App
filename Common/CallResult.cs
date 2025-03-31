@@ -1,4 +1,4 @@
-namespace axon_final_api.Common;
+namespace Axon_Job_App.Common;
 
 public record CallResult<T>
 {

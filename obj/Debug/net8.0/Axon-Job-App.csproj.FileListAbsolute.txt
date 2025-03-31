@@ -228,3 +228,10 @@
 /Users/hughes/Docs/Axon-Codes/Axon-Job-App/obj/Debug/net8.0/Axon-Job-App.pdb
 /Users/hughes/Docs/Axon-Codes/Axon-Job-App/obj/Debug/net8.0/Axon-Job-App.genruntimeconfig.cache
 /Users/hughes/Docs/Axon-Codes/Axon-Job-App/obj/Debug/net8.0/ref/Axon-Job-App.dll
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/appsettings.Development.json
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/appsettings.json
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/Axon-Job-App.deps.json
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/Axon-Job-App.runtimeconfig.json
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/Axon-Job-App.staticwebassets.endpoints.json
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/bin/Debug/net8.0/out/web.config
+/Users/hughes/Docs/Axon-Codes/Axon-Job-App/obj/Debug/net8.0/Axon-Job-App.sourcelink.json
