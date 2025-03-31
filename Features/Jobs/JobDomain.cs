@@ -7,19 +7,17 @@ public record JobResponse(
     long Id,
     long ClientId,
     string Title,
-    string? TemporaryType,
     JobType JobType,
     JobStatus Status,
     PaymentType PaymentType,
-    decimal PaymentAmount,
+    decimal SalaryPerAnnum,
     string[] Duties,
     string[] Requirements,
     string JobHours,
     string Location,
-    bool Published,
     DateTime StartDate,
     int NumberOfRoles,
-    string? WorkingHours,
+    bool Published,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );
@@ -27,35 +25,31 @@ public record JobResponse(
 public record CreateJobRequest(
     long ClientId,
     string Title,
-    string? TemporaryType,
     JobType JobType,
     PaymentType PaymentType,
-    decimal PaymentAmount,
+    decimal SalaryPerAnnum,
     string[] Duties,
     string[] Requirements,
     string JobHours,
     string Location,
     DateTime StartDate,
     int NumberOfRoles,
-    string? WorkingHours = null
+    bool Published = false
 );
 
 public record UpdateJobRequest(
     string? Title,
-    string? TemporaryType,
     JobType? JobType,
     PaymentType? PaymentType,
-    decimal? PaymentAmount,
+    decimal? SalaryPerAnnum,
     string[]? Duties,
     string[]? Requirements,
     string? JobHours,
     string? Location,
-    bool? Published,
     DateTime? StartDate,
     int? NumberOfRoles,
-    string? WorkingHours
+    bool? Published
 );
-
 public record AssignJobRequest(
     long JobId,
     long CandidateId,
