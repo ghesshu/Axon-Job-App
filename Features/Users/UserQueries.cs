@@ -2,8 +2,7 @@ using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Axon_Job_App.Services;
 using Cai;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Axon_Job_App.Features.Users;
 
@@ -50,5 +49,8 @@ public partial class UserQueries
         }
         return db.Permissions.AsQueryable();
     }
+
+    [Query<CallResult<UserResponse>>]
+    public record GetUserById(long Id); 
 
 }

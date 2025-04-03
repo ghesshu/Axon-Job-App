@@ -4,11 +4,20 @@ using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
+using Axon_Job_App.Services;
+
 
 namespace Axon_Job_App.Features.Clients;
 
-public class ClientHandler
+public class ClientHandler(AuthContext authContext)
 {
+    public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
     public async Task<CallResult<ClientResponse>> Handle(
         ClientMutation.CreateClient command, 
         DataContext db, 
@@ -16,6 +25,9 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
+
             var existingClient = await db.Clients
                 .FirstOrDefaultAsync(c => c.CompanyName == command.Input.CompanyName, cancellationToken);
             
@@ -57,6 +69,9 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
+
             var client = await db.Clients.FindAsync(new object?[] { command.Id }, cancellationToken);
             if (client == null)
                 return CallResult<ClientResponse>.error("Client not found");
@@ -100,6 +115,9 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
+
             var client = await db.Clients
                 .Include(c => c.Jobs)
                 .FirstOrDefaultAsync(c => c.Id == command.Id, cancellationToken);
@@ -129,6 +147,8 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var client = await db.Clients.FindAsync([command.Id], cancellationToken);
             if (client == null)
                 return CallResult.error("Client not found");

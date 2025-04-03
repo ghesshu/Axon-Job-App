@@ -2,12 +2,20 @@ using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Features.Clients;
+using Axon_Job_App.Services;
 
 
 namespace Axon_Job_App.Features.Jobs;
 
-public class JobHandler
+public class JobHandler(AuthContext authContext)
 {
+    public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
     public async Task<CallResult<JobResponse>> Handle(
         JobMutation.CreateJob command, 
         DataContext db, 
@@ -15,6 +23,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var clientExists = await db.Clients.AnyAsync(c => c.Id == command.Input.ClientId, ct);
             if (!clientExists)
                 return CallResult<JobResponse>.error("Client not found");
@@ -73,6 +83,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
             if (job == null)
                 return CallResult<JobResponse>.error("Job not found");
@@ -153,6 +165,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
             if (job == null)
                 return CallResult.error("Job not found");
@@ -175,6 +189,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var job = await db.Jobs.FindAsync(new object?[] { command.Id }, ct);
             if (job == null)
                 return CallResult.error("Job not found");
@@ -198,6 +214,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var jobExists = await db.Jobs.AnyAsync(j => j.Id == command.Input.JobId, ct);
             if (!jobExists)
                 return CallResult.error("Job not found");
@@ -231,6 +249,9 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
+
             var assignment = await db.JobAssignments
                 .FirstOrDefaultAsync(a => 
                     a.JobId == command.JobId && 

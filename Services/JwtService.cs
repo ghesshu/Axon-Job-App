@@ -8,12 +8,19 @@ using System.Text;
 
 namespace Axon_Job_App.Services;
 
-public class JwtService(IConfiguration config)
+public class JwtService
 {
-    private readonly IConfiguration _config = config;
+    private static IConfiguration? _config;
 
-    public string GenerateToken(string userId, string role, List<string> permissions)
+    public static void Initialize(IConfiguration configuration)
     {
+        _config = configuration;
+    }
+
+    public static string GenerateToken(string userId, string role, List<string> permissions)
+    {
+        if (_config == null)
+            throw new InvalidOperationException("JWT configuration is not initialized");
         var jwtKey = _config["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key", "JWT key is not configured.");
         var key = Encoding.UTF8.GetBytes(jwtKey);
         var tokenHandler = new JwtSecurityTokenHandler();
