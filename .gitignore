@@ -491,3 +491,5 @@ DB/AxonFinal.db-shm
 DB/AxonFinal.db-wal
 *.db-wal
 *.db-shm
+bin/
+obj/
