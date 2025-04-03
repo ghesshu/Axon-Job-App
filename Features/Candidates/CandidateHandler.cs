@@ -5,11 +5,21 @@ using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
 using Axon_Job_App.Features.Jobs;
+using Axon_Job_App.Services;
 
 namespace Axon_Job_App.Features.Candidates;
 
-public class CandidateHandler
+public class CandidateHandler(AuthContext authContext)
 {
+
+    public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
+
     public async Task<CallResult<CandidateResponse>> Handle(
         CandidateMutation.CreateCandidate command, 
         DataContext db, 
@@ -17,6 +27,8 @@ public class CandidateHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var existingCandidate = await db.Candidates
                 .FirstOrDefaultAsync(c => c.Email == command.Input.Email, ct);
             
@@ -60,6 +72,8 @@ public class CandidateHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var candidate = await db.Candidates.FindAsync([command.Id], ct);
             if (candidate == null)
                 return CallResult<CandidateResponse>.error("Candidate not found");
@@ -107,6 +121,8 @@ public class CandidateHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var candidate = await db.Candidates
                 .Include(c => c.Assignments)
                 .FirstOrDefaultAsync(c => c.Id == command.Id, ct);
@@ -152,6 +168,8 @@ public class CandidateHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var candidate = await db.Candidates.FindAsync([command.Id], ct);
             if (candidate == null)
                 return CallResult.error("Candidate not found");
@@ -175,6 +193,8 @@ public class CandidateHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+            
             var candidateExists = await db.Candidates.AnyAsync(c => c.Id == command.CandidateId, ct);
             if (!candidateExists)
                 return CallResult.error("Candidate not found");

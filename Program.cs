@@ -9,7 +9,23 @@ using Axon_Job_App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.useCai();
+
+
+
+builder.addCai(graphqlOverrides: gqlBuilder =>
+{
+     var allowIntrospection = builder.Configuration.GetRequiredSection("docs").GetValue<bool>("graphql");
+     gqlBuilder
+         .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = allowIntrospection)
+         .ModifyCostOptions(opt =>
+         {
+             opt.EnforceCostLimits = false;
+         })
+         .AddMutationConventions(true);
+ 
+         
+});
+
 
 // Configuration
 var configuration = builder.Configuration;
@@ -57,6 +73,9 @@ builder.Services.AddSingleton<JwtService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthContext>();
 
+// Initialize Config for JwtService
+JwtService.Initialize(builder.Configuration);
+
 
 var app = builder.Build();
 
@@ -78,7 +97,8 @@ app.MigrateDb();
 
 app.MapControllers();
 
-app.mapCai(); 
+// app.mapCai(); 
+app.useCai();
 
 app.Run();
 
