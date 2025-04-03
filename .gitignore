@@ -487,3 +487,4 @@ $RECYCLE.BIN/
 bin/
 obj/DB/AxonFinal.db-shm
 DB/AxonFinal.db-wal
+DB/AxonFinal.db-shm
