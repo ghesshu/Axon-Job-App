@@ -5,27 +5,58 @@ namespace Axon_Job_App.Features.Clients;
 public record ClientResponse(
     long Id,
     string CompanyName,
-    string? CompanyImage,
+    string CeoFirstName,
+    string CeoLastName,
+    string? JobTitle,
+    string CompanyEmail,
+    string CompanyPhone,
+    string CompanyAddress,
+    string PostalCode,
+    string RegistrationNumber,
+    string? Website,
+    string? LinkedIn,
+    string? LocationCoordinates,
+    string? CompanyLogo,
     string CompanyLocation,
     DateTime DateJoined,
     string VerificationStatus,
-    // int NumberOfAttendingCandidates,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );
 
 public record CreateClientRequest(
     string CompanyName,
-    string? CompanyImage,
+    string CeoFirstName,
+    string CeoLastName,
+    string? JobTitle,
+    string CompanyEmail,
+    string CompanyPhone,
+    string CompanyAddress,
+    string PostalCode,
+    string RegistrationNumber,
+    string? Website,
+    string? LinkedIn,
+    string? LocationCoordinates,
+    string? CompanyLogo,
     string CompanyLocation,
     VerificationStatus VerificationStatus = VerificationStatus.Pending
 );
 
 public record UpdateClientRequest(
     string? CompanyName,
-    string? CompanyImage,
+    string? CeoFirstName,
+    string? CeoLastName,
+    string? JobTitle,
+    string? CompanyEmail,
+    string? CompanyPhone,
+    string? CompanyAddress,
+    string? PostalCode,
+    string? RegistrationNumber,
+    string? Website,
+    string? LinkedIn,
+    string? LocationCoordinates,
+    string? CompanyLogo,
     string? CompanyLocation
-    // VerificationStatus? VerificationStatus
 );
 
 public enum VerificationStatus

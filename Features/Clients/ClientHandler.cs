@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
 using Axon_Job_App.Services;
 
-
 namespace Axon_Job_App.Features.Clients;
 
 public class ClientHandler(AuthContext authContext)
@@ -18,6 +17,7 @@ public class ClientHandler(AuthContext authContext)
             throw new UnauthorizedAccessException("Unauthorized");
         }
     }
+
     public async Task<CallResult<ClientResponse>> Handle(
         ClientMutation.CreateClient command, 
         DataContext db, 
@@ -27,34 +27,34 @@ public class ClientHandler(AuthContext authContext)
         {
             await EnsureAuthenticated(authContext);
 
-
-            var existingClient = await db.Clients
-                .FirstOrDefaultAsync(c => c.CompanyName == command.Input.CompanyName, cancellationToken);
-            
-            if (existingClient != null)
+            // Use Any() instead of FirstOrDefaultAsync for existence check - better performance
+            if (await db.Clients.AnyAsync(c => c.CompanyName == command.Input.CompanyName, cancellationToken))
                 return CallResult<ClientResponse>.error("Client already exists");
 
             var client = new Client
             {
                 CompanyName = command.Input.CompanyName,
-                CompanyImage = command.Input.CompanyImage,
+                CeoFirstName = command.Input.CeoFirstName,
+                CeoLastName = command.Input.CeoLastName,
+                JobTitle = command.Input.JobTitle,
+                CompanyEmail = command.Input.CompanyEmail,
+                CompanyPhone = command.Input.CompanyPhone,
+                CompanyAddress = command.Input.CompanyAddress,
+                PostalCode = command.Input.PostalCode,
+                RegistrationNumber = command.Input.RegistrationNumber,
+                Website = command.Input.Website,
+                LinkedIn = command.Input.LinkedIn,
+                LocationCoordinates = command.Input.LocationCoordinates,
+                CompanyLogo = command.Input.CompanyLogo,
                 CompanyLocation = command.Input.CompanyLocation,
                 VerificationStatus = command.Input.VerificationStatus.ToString()
             };
 
-            db.Clients.Add(client);
+            // Use AddAsync for better async performance
+            await db.Clients.AddAsync(client, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
 
-            return CallResult<ClientResponse>.ok(new ClientResponse(
-                client.Id,
-                client.CompanyName,
-                client.CompanyImage,
-                client.CompanyLocation,
-                client.DateJoined,
-                client.VerificationStatus,
-                client.CreatedAt,
-                client.UpdatedAt
-            ), "Client created successfully");
+            return CallResult<ClientResponse>.ok(MapToResponse(client), "Client created successfully");
         }
         catch (Exception e)
         {
@@ -71,36 +71,17 @@ public class ClientHandler(AuthContext authContext)
         {
             await EnsureAuthenticated(authContext);
 
-
-            var client = await db.Clients.FindAsync(new object?[] { command.Id }, cancellationToken);
+            var client = await db.Clients.FindAsync([command.Id], cancellationToken);
             if (client == null)
                 return CallResult<ClientResponse>.error("Client not found");
 
-            if (!string.IsNullOrEmpty(command.Input.CompanyName))
-                client.CompanyName = command.Input.CompanyName;
-
-            if (!string.IsNullOrEmpty(command.Input.CompanyImage))
-                client.CompanyImage = command.Input.CompanyImage;
-
-            if (!string.IsNullOrEmpty(command.Input.CompanyLocation))
-                client.CompanyLocation = command.Input.CompanyLocation;
-
-            // if (command.Input.VerificationStatus.HasValue)
-            //     client.VerificationStatus = command.Input.VerificationStatus.Value.ToString();
+            // Use pattern matching for cleaner null checks
+            UpdateClientProperties(client, command.Input);
 
             client.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(cancellationToken);
 
-            return CallResult<ClientResponse>.ok(new ClientResponse(
-                client.Id,
-                client.CompanyName,
-                client.CompanyImage,
-                client.CompanyLocation,
-                client.DateJoined,
-                client.VerificationStatus,
-                client.CreatedAt,
-                client.UpdatedAt
-            ), "Client updated successfully");
+            return CallResult<ClientResponse>.ok(MapToResponse(client), "Client updated successfully");
         }
         catch (Exception e)
         {
@@ -109,28 +90,29 @@ public class ClientHandler(AuthContext authContext)
     }
 
     public async Task<CallResult> Handle(
-    ClientMutation.DeleteClient command, 
-    DataContext db, 
-    CancellationToken cancellationToken)
+        ClientMutation.DeleteClient command, 
+        DataContext db, 
+        CancellationToken cancellationToken)
     {
         try
         {
             await EnsureAuthenticated(authContext);
-
-
-            var client = await db.Clients
-                .Include(c => c.Jobs)
-                .FirstOrDefaultAsync(c => c.Id == command.Id, cancellationToken);
             
-            if (client == null)
+            // Use a single query to check both existence and job count
+            var clientWithJobs = await db.Clients
+                .Select(c => new { c.Id, JobCount = c.Jobs.Count })
+                .FirstOrDefaultAsync(c => c.Id == command.Id, cancellationToken);
+
+            if (clientWithJobs == null)
                 return CallResult.error("Client not found");
 
-            // Check if client has any associated jobs
-            if (client.Jobs.Count != 0)
+            if (clientWithJobs.JobCount > 0)
                 return CallResult.error("Client cannot be deleted because it has associated jobs");
 
-            db.Clients.Remove(client);
-            await db.SaveChangesAsync(cancellationToken);
+            // Use ExecuteDeleteAsync for better performance
+            await db.Clients
+                .Where(c => c.Id == command.Id)
+                .ExecuteDeleteAsync(cancellationToken);
 
             return CallResult.ok("Client deleted successfully");
         }
@@ -147,17 +129,16 @@ public class ClientHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            // Use ExecuteUpdateAsync for better performance
+            var updated = await db.Clients
+                .Where(c => c.Id == command.Id)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(c => c.VerificationStatus, command.Status.ToString())
+                    .SetProperty(c => c.UpdatedAt, DateTime.UtcNow),
+                    cancellationToken);
 
-            var client = await db.Clients.FindAsync([command.Id], cancellationToken);
-            if (client == null)
+            if (updated == 0)
                 return CallResult.error("Client not found");
-
-            
-
-            client.VerificationStatus = command.Status.ToString();
-            client.UpdatedAt = DateTime.UtcNow;
-            await db.SaveChangesAsync(cancellationToken);
 
             return CallResult.ok("Client verification status updated successfully");
         }
@@ -167,4 +148,44 @@ public class ClientHandler(AuthContext authContext)
         }
     }
 
+    // Helper methods for cleaner code
+    private static ClientResponse MapToResponse(Client client) => new(
+        client.Id,
+        client.CompanyName,
+        client.CeoFirstName,
+        client.CeoLastName,
+        client.JobTitle,
+        client.CompanyEmail,
+        client.CompanyPhone,
+        client.CompanyAddress,
+        client.PostalCode,
+        client.RegistrationNumber,
+        client.Website,
+        client.LinkedIn,
+        client.LocationCoordinates,
+        client.CompanyLogo,
+        client.CompanyLocation,
+        client.DateJoined,
+        client.VerificationStatus,
+        client.CreatedAt,
+        client.UpdatedAt
+    );
+
+    private static void UpdateClientProperties(Client client, UpdateClientRequest input)
+    {
+        if (!string.IsNullOrEmpty(input.CompanyName)) client.CompanyName = input.CompanyName;
+        if (!string.IsNullOrEmpty(input.CeoFirstName)) client.CeoFirstName = input.CeoFirstName;
+        if (!string.IsNullOrEmpty(input.CeoLastName)) client.CeoLastName = input.CeoLastName;
+        if (input.JobTitle != null) client.JobTitle = input.JobTitle;
+        if (!string.IsNullOrEmpty(input.CompanyEmail)) client.CompanyEmail = input.CompanyEmail;
+        if (!string.IsNullOrEmpty(input.CompanyPhone)) client.CompanyPhone = input.CompanyPhone;
+        if (!string.IsNullOrEmpty(input.CompanyAddress)) client.CompanyAddress = input.CompanyAddress;
+        if (!string.IsNullOrEmpty(input.PostalCode)) client.PostalCode = input.PostalCode;
+        if (!string.IsNullOrEmpty(input.RegistrationNumber)) client.RegistrationNumber = input.RegistrationNumber;
+        if (input.Website != null) client.Website = input.Website;
+        if (input.LinkedIn != null) client.LinkedIn = input.LinkedIn;
+        if (input.LocationCoordinates != null) client.LocationCoordinates = input.LocationCoordinates;
+        if (input.CompanyLogo != null) client.CompanyLogo = input.CompanyLogo;
+        if (!string.IsNullOrEmpty(input.CompanyLocation)) client.CompanyLocation = input.CompanyLocation;
+    }
 }
