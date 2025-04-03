@@ -12,7 +12,7 @@ var connString = configuration.GetConnectionString("DevDB");
 
 // Database Context - register first without scoped registration
 builder.Services.AddDbContext<DataContext>(options => 
-    options.UseSqlite(connString));
+    options.UseSqlite(connString)); 
 
 builder.Services.AddControllers();
 
