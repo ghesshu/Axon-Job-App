@@ -1,6 +1,7 @@
 using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Axon_Job_App.Features.Clients;
+using Axon_Job_App.Services;
 using Cai;
 using JasperFx.Core.Reflection;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +15,12 @@ public partial class JobQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Job> Jobs([Service] DataContext db) 
+    public IQueryable<Job> Jobs([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.Jobs.AsQueryable();
     }
 
@@ -23,8 +28,12 @@ public partial class JobQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<JobAssignment> JobAssignments([Service] DataContext db) 
+    public IQueryable<JobAssignment> JobAssignments([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.JobAssignments.AsQueryable();
     }
     

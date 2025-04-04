@@ -1,7 +1,7 @@
-using Axon_Job_App.Common;
 using Axon_Job_App.Data;
+using Axon_Job_App.Services;
 using Cai;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Axon_Job_App.Features.Candidates;
 
@@ -12,8 +12,12 @@ public partial class CandidateQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Candidate> Candidates([Service] DataContext db) 
+    public IQueryable<Candidate> Candidates([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.Candidates.AsQueryable();
     }
 }

@@ -1,5 +1,6 @@
 using Axon_Job_App.Common;
 using Axon_Job_App.Data;
+using Axon_Job_App.Services;
 using Cai;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,12 @@ public partial class ClientQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Client> Clients([Service] DataContext db) 
+    public IQueryable<Client> Clients([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.Clients.AsQueryable();
     }
 

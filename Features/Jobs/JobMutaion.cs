@@ -23,4 +23,7 @@ public class JobMutation
 
     [Mutation<CallResult>]
     public record UpdateAssignmentStatus(long JobId, long CandidateId, AssignmentStatus Status);
+
+    [Mutation<CallResult>]
+    public record DeleteAssignment(long JobId, long CandidateId);
 }

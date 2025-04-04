@@ -1,5 +1,6 @@
 using Axon_Job_App.Common;
 using Axon_Job_App.Data;
+using Axon_Job_App.Services;
 using Cai;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +14,13 @@ public partial class UserQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<User> Users([Service] DataContext db) 
+    public IQueryable<User> Users([Service] DataContext db, [Service] AuthContext authContext)  
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+        
         return db.Users.AsQueryable();
     }
 
@@ -22,8 +28,12 @@ public partial class UserQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Role> Roles([Service] DataContext db) 
+    public IQueryable<Role> Roles([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.Roles.AsQueryable();
     }
 
@@ -32,8 +42,12 @@ public partial class UserQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Permission> Permissions([Service] DataContext db) 
+    public IQueryable<Permission> Permissions([Service] DataContext db, [Service] AuthContext authContext) 
     {
+        if (!authContext.IsAuthenticated())
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
         return db.Permissions.AsQueryable();
     }
 

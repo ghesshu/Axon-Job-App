@@ -2,13 +2,22 @@ using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Features.Clients;
+using Axon_Job_App.Services;
 
 
 namespace Axon_Job_App.Features.Jobs;
 
-public class JobHandler
+public class JobHandler(AuthContext authContext)
 {
-        private static JobResponse MapToResponse(Job job) => new(
+    public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
+
+    private static JobResponse MapToResponse(Job job) => new(
         job.Id,
         job.ClientId,
         job.Title,
@@ -34,6 +43,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             if (!await db.Clients.AnyAsync(c => c.Id == command.Input.ClientId, ct))
                 return CallResult<JobResponse>.error("Client not found");
 
@@ -70,6 +81,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var job = await db.Jobs.FindAsync([command.Id], ct);
             if (job == null)
                 return CallResult<JobResponse>.error("Job not found");
@@ -129,6 +142,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             // Check existence and assignments in single query
             var jobInfo = await db.Jobs
                 .Where(j => j.Id == command.Id)
@@ -161,6 +176,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var updated = await db.Jobs
                 .Where(j => j.Id == command.Id)
                 .ExecuteUpdateAsync(setters => setters
@@ -186,9 +203,17 @@ public class JobHandler
     {
         try
         {
-            var jobExists = await db.Jobs.AnyAsync(j => j.Id == command.Input.JobId, ct);
-            if (!jobExists)
+            await EnsureAuthenticated(authContext);
+
+            var job = await db.Jobs
+                .Include(j => j.Assignments)
+                .FirstOrDefaultAsync(j => j.Id == command.Input.JobId, ct);
+
+            if (job == null)
                 return CallResult.error("Job not found");
+
+            if (job.Assignments.Count >= job.NumberOfRoles)
+                return CallResult.error("Job has reached maximum number of assignments");
 
             var candidateExists = await db.Candidates.AnyAsync(c => c.Id == command.Input.CandidateId, ct);
             if (!candidateExists)
@@ -211,7 +236,6 @@ public class JobHandler
             return CallResult.error(e.Message);
         }
     }
-
     public async Task<CallResult> Handle(
         JobMutation.UpdateAssignmentStatus command, 
         DataContext db, 
@@ -219,6 +243,8 @@ public class JobHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var assignment = await db.JobAssignments
                 .FirstOrDefaultAsync(a => 
                     a.JobId == command.JobId && 
@@ -233,6 +259,32 @@ public class JobHandler
             return CallResult.ok("Assignment status updated successfully");
         }
         catch (Exception e)
+        {
+            return CallResult.error(e.Message);
+        }
+    }
+
+    public async Task<CallResult> Handle(JobMutation.DeleteAssignment command, DataContext db, CancellationToken ct)
+    {
+        try
+        {
+            await EnsureAuthenticated(authContext);
+
+            var assignment = await db.JobAssignments
+                .FirstOrDefaultAsync(a => 
+                    a.JobId == command.JobId && 
+                    a.CandidateId == command.CandidateId, ct);
+            
+            if(assignment == null)
+            {
+                return CallResult.error("Assignment not found");
+            }
+
+            db.JobAssignments.Remove(assignment);
+            await db.SaveChangesAsync(ct);
+
+            return CallResult.ok("Assignment deleted successfully");
+        } catch (Exception e)
         {
             return CallResult.error(e.Message);
         }

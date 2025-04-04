@@ -4,11 +4,20 @@ using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
+using Axon_Job_App.Services;
 
 namespace Axon_Job_App.Features.Clients;
 
-public class ClientHandler
+public class ClientHandler(AuthContext authContext)
 {
+     public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
+
     public async Task<CallResult<ClientResponse>> Handle(
         ClientMutation.CreateClient command, 
         DataContext db, 
@@ -16,6 +25,7 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
             // Use Any() instead of FirstOrDefaultAsync for existence check - better performance
             if (await db.Clients.AnyAsync(c => c.CompanyName == command.Input.CompanyName, cancellationToken))
                 return CallResult<ClientResponse>.error("Client already exists");
@@ -58,6 +68,7 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
             var client = await db.Clients.FindAsync([command.Id], cancellationToken);
             if (client == null)
                 return CallResult<ClientResponse>.error("Client not found");
@@ -83,6 +94,7 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
             // Use a single query to check both existence and job count
             var clientWithJobs = await db.Clients
                 .Select(c => new { c.Id, JobCount = c.Jobs.Count })
@@ -114,6 +126,7 @@ public class ClientHandler
     {
         try
         {
+            await EnsureAuthenticated(authContext);
             // Use ExecuteUpdateAsync for better performance
             var updated = await db.Clients
                 .Where(c => c.Id == command.Id)

@@ -2,22 +2,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Axon_Job_App.Common;
 using Axon_Job_App.Data;
-using Microsoft.AspNetCore.Identity;
 using static BCrypt.Net.BCrypt;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Common.Extensions;
+using Axon_Job_App.Services;
 
 namespace Axon_Job_App.Features.Users;
 
-public class UserHandler()
+public class UserHandler(AuthContext authContext)
 {     
-    // private readonly AuthContext authContext = _authContext;
+    public async Task EnsureAuthenticated(AuthContext authContext)
+    {
+        if (!await Task.FromResult(authContext.IsAuthenticated()))
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+    }
 
     // User handlers
     public async Task<CallResult<LoginResponse>> Handle(UserMutation.Login command, DataContext db,ILogger<UserHandler> logger, CancellationToken cancellationToken)
     {
        try
        {
+         
          var user = await db.Users
             .Include(u => u.Role)
             .ThenInclude(r => r!.RolePermissions)
@@ -29,19 +36,18 @@ public class UserHandler()
         var permissions = user.Role?.RolePermissions
             .Select(rp => rp.PermissionName) ?? [];
 
-        // var token = authContext.GenerateToken(
-        //     user.Id,
-        //     user.Email,
-        //     user.Role?.Name ?? "User",
-        //     permissions);
+        var token = JwtService.GenerateToken(
+            user.Id.ToString(),
+            user.Role?.Name ?? "User",
+            permissions.ToList());
 
         return CallResult<LoginResponse>.ok(new LoginResponse(
             user.Id,
             user.Email,
             user.Role?.Name ?? "User",
             permissions,
-            // token
-            "Hello-world"
+            token
+            // "Hello-world"
             ),
             "Login successful");
        }
@@ -60,7 +66,7 @@ public class UserHandler()
     {
        try
        {
-        //  await authContext.CheckRole(db, "Admin");
+        await EnsureAuthenticated(authContext);
 
         var existingUser = await db.Users
             .FirstOrDefaultAsync(u => u.Email == command.Input.Email, cancellationToken);
@@ -95,9 +101,9 @@ public class UserHandler()
     {
        try
        {
-        //  await authContext.CheckRole(db, "Admin");
+        await EnsureAuthenticated(authContext);
 
-        var user = await db.Users.FindAsync(new object?[] { command.Id }, cancellationToken: cancellationToken);
+        var user = await db.Users.FindAsync([command.Id], cancellationToken: cancellationToken);
         if (user == null)
             return CallResult<UserResponse>.error("User not found");
 
@@ -129,7 +135,8 @@ public class UserHandler()
     {
        try
        {
-        // await authContext.CheckRole(db, "Admin");
+
+         await EnsureAuthenticated(authContext);
 
          var user = await db.Users.FindAsync([command.Id], cancellationToken: cancellationToken);
         if (user == null)
@@ -155,6 +162,8 @@ public class UserHandler()
     {
         try
         {
+             await EnsureAuthenticated(authContext);
+
             var existingRole = await db.Roles
                 .FirstOrDefaultAsync(r => r.Name == command.Input.Name, cancellationToken);
             
@@ -194,6 +203,8 @@ public class UserHandler()
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var role = await db.Roles.FindAsync([command.Id], cancellationToken);
             if (role == null)
                 return CallResult<RoleResponse>.error("Role not found");
@@ -230,6 +241,8 @@ public class UserHandler()
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+
             var role = await db.Roles
                 .Include(r => r.Users)
                 .FirstOrDefaultAsync(r => r.Id == command.Id, cancellationToken);
@@ -259,6 +272,9 @@ public class UserHandler()
     {
         try
         {
+             
+            await EnsureAuthenticated(authContext);
+
             var role = await db.Roles
                 .Include(r => r.RolePermissions)
                 .FirstOrDefaultAsync(r => r.Id == command.Input.RoleId, cancellationToken);
@@ -296,6 +312,8 @@ public class UserHandler()
     {
         try
         {
+            await EnsureAuthenticated(authContext);
+            
             var permissionsToRemove = await db.RolePermissions
                 .Where(rp => rp.RoleId == command.Input.RoleId &&
                     command.Input.PermissionNames.Contains(rp.PermissionName))
