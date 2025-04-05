@@ -36,7 +36,7 @@ public class AuthContext(IHttpContextAccessor httpContextAccessor)
     public bool IsAuthenticated()
     {
         var claims = GetUserClaims();
-        return claims?.Identity?.IsAuthenticated ?? true;
+        return claims?.Identity?.IsAuthenticated ?? false;
     }
 
     public async Task CheckRole(DataContext db, string requiredRole)
