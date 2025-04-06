@@ -70,10 +70,10 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors();
 
 app.UseHttpsRedirection();
 
-app.UseCors();
 
 app.MigrateDb();
 
