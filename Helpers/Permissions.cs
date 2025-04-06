@@ -7,14 +7,14 @@ public static class Permissions
     public static readonly string[] All =
     [
         // User Management
-        "ReadUsers", "CreateUser", "UpdateUser", "DeleteUser",
+        "ReadUsers", "CreateUser", "UpdateUser",
         
         // Role Management
-        "ReadRoles", "CreateRole", "UpdateRole", "DeleteRole",
-        
-        // Permission Management
-        "ReadPermissions",
-        
-        // Add more permissions as needed
+        "ReadRoles", "CreateRole", "UpdateRole",
+
+        //Custom
+        "createUser","createClient","seeAnalysis",
+        "deleteClient","deleteCandidate","verifyClient"
+
     ];
 }

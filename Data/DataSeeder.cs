@@ -32,19 +32,19 @@ public class DataSeeder
             })]
         };
 
-        var clientRole = new Role
-        {
-            Name = "Client",
-            Description = "Client role with limited access"
-        };
+        // var clientRole = new Role
+        // {
+        //     Name = "Client",
+        //     Description = "Client role with limited access"
+        // };
 
-        var candidateRole = new Role
-        {
-            Name = "Candidate",
-            Description = "Candidate role with basic access"
-        };
+        // var candidateRole = new Role
+        // {
+        //     Name = "Candidate",
+        //     Description = "Candidate role with basic access"
+        // };
 
-        await context.Roles.AddRangeAsync(adminRole, clientRole, candidateRole);
+        await context.Roles.AddRangeAsync(adminRole);
         await context.SaveChangesAsync();
 
         // Create Admin User
