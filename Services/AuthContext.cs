@@ -25,6 +25,19 @@ public class AuthContext(IHttpContextAccessor httpContextAccessor)
         try
         {
             var jwtToken = handler.ReadJwtToken(token);
+
+            // Check if token is expired
+            var expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp");
+            if (expClaim != null)
+            {
+                var expTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim.Value));
+                if (expTime <= DateTimeOffset.UtcNow)
+                {
+                    // Token is expired
+                    return null;
+                }
+            }
+            
             return new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "jwt"));
         }
         catch
