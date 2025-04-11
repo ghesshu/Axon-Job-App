@@ -1,9 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Axon_Job_App.Data;
 using Axon_Job_App.Features.Jobs;
 using Axon_Job_App.Helpers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Axon_Job_App.Features.Clients;
+namespace Axon_Job_App.Data;
+
+public partial class DataContext
+{
+    public DbSet<Client> Clients { get; set; } = null!;
+}
 
 public class Client : IHasTimestamps
 {
@@ -59,4 +67,15 @@ public class Client : IHasTimestamps
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public class TypeConfiguration : IEntityTypeConfiguration<Client>
+    {
+        public void Configure(EntityTypeBuilder<Client> builder)
+        {
+            builder.HasMany(c => c.Jobs)
+            .WithOne(j => j.Client)
+            .HasForeignKey(j => j.ClientId)
+            .OnDelete(DeleteBehavior.Cascade); // Or Restrict if you prefer
+        }
+    }
 }

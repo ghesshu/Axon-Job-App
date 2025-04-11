@@ -1,4 +1,5 @@
 using System;
+using Axon_Job_App.Features.Jobs;
 using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
 
@@ -17,10 +18,10 @@ public partial class DataContext(DbContextOptions<DataContext> options) : DbCont
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ConfigureCandidates(modelBuilder);
-        ConfigureUsers(modelBuilder);
-        ConfigureJobs(modelBuilder);
-        ConfigureClients(modelBuilder);
+        modelBuilder.ApplyConfiguration(new User.TypeConfiguration());
+        modelBuilder.ApplyConfiguration(new Job.TypeConfiguration());
+        modelBuilder.ApplyConfiguration(new Client.TypeConfiguration());
+        modelBuilder.ApplyConfiguration(new Candidate.TypeConfiguration());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

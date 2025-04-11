@@ -2,9 +2,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Axon_Job_App.Features.Candidates;
 using Axon_Job_App.Features.Clients;
+using Axon_Job_App.Features.Jobs;
 using Axon_Job_App.Helpers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Axon_Job_App.Features.Jobs;
+namespace Axon_Job_App.Data;
+
+public partial class DataContext
+{
+    public DbSet<Job> Jobs { get; set; }
+    public DbSet<JobAssignment> JobAssignments { get; set; }
+}
 
 public class Job : IHasTimestamps
 {
@@ -63,10 +72,23 @@ public class Job : IHasTimestamps
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    
+    // Config Codes
+
+    public class TypeConfiguration : IEntityTypeConfiguration<Job>
+    {
+        public void Configure(EntityTypeBuilder<Job> builder)
+        {
+            builder.Property(j => j.JobType).HasConversion<string>();
+            builder.Property(j => j.Status).HasConversion<string>();
+            builder.Property(j => j.PaymentType).HasConversion<string>();
+        }
+    }
 }
 
 public class JobAssignment
 {
+    [Key]
     public long JobId { get; set; }
     public virtual Job Job { get; set; } = null!;
 
@@ -77,6 +99,30 @@ public class JobAssignment
     
     [Column(TypeName = "varchar(20)")]
     public AssignmentStatus Status { get; set; } = AssignmentStatus.Active;
+    
+    // DB Codes
+    public class TypeConfiguration : IEntityTypeConfiguration<JobAssignment>
+    {
+        public void Configure(EntityTypeBuilder<JobAssignment> builder)
+        {
+            builder.Property(j => j.Status).HasConversion<string>();
+            
+            builder.HasKey(ja => new { ja.JobId, ja.CandidateId }); // Composite primary key
+
+            builder
+                .HasOne(ja => ja.Job)
+                .WithMany(j => j.Assignments)
+                .HasForeignKey(ja => ja.JobId)
+                .OnDelete(DeleteBehavior.Cascade); // Or Restrict
+
+            builder
+                .HasOne(ja => ja.Candidate)
+                .WithMany(c => c.Assignments)
+                .HasForeignKey(ja => ja.CandidateId)
+                .OnDelete(DeleteBehavior.Cascade); // Or Restrict
+            
+        }
+    }
 
 }
 

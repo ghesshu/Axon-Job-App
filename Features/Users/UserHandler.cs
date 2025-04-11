@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Axon_Job_App.Common;
 using Axon_Job_App.Data;
 using static BCrypt.Net.BCrypt;
@@ -11,7 +9,7 @@ namespace Axon_Job_App.Features.Users;
 
 public class UserHandler(AuthContext authContext)
 {     
-    public async Task EnsureAuthenticated(AuthContext authContext)
+    private async Task EnsureAuthenticated()
     {
         if (!await Task.FromResult(authContext.IsAuthenticated()))
         {
@@ -34,12 +32,13 @@ public class UserHandler(AuthContext authContext)
             return CallResult<LoginResponse>.error("Invalid credentials");
 
         var permissions = user.Role?.RolePermissions
-            .Select(rp => rp.PermissionName) ?? [];
+            .Select(rp => rp.PermissionName)
+            .ToList() ?? new List<string>();
 
         var token = JwtService.GenerateToken(
             user.Id.ToString(),
             user.Role?.Name ?? "User",
-            permissions.ToList());
+            permissions);
 
         return CallResult<LoginResponse>.ok(new LoginResponse(
             user.Id,
@@ -47,7 +46,6 @@ public class UserHandler(AuthContext authContext)
             user.Role?.Name ?? "User",
             permissions,
             token
-            // "Hello-world"
             ),
             "Login successful");
        }
@@ -66,7 +64,7 @@ public class UserHandler(AuthContext authContext)
     {
        try
        {
-        await EnsureAuthenticated(authContext);
+        await EnsureAuthenticated();
 
         var existingUser = await db.Users
             .FirstOrDefaultAsync(u => u.Email == command.Input.Email, cancellationToken);
@@ -101,7 +99,7 @@ public class UserHandler(AuthContext authContext)
     {
        try
        {
-        await EnsureAuthenticated(authContext);
+        await EnsureAuthenticated();
 
         var user = await db.Users.FindAsync([command.Id], cancellationToken: cancellationToken);
         if (user == null)
@@ -136,7 +134,7 @@ public class UserHandler(AuthContext authContext)
        try
        {
 
-         await EnsureAuthenticated(authContext);
+         await EnsureAuthenticated();
 
          var user = await db.Users.FindAsync([command.Id], cancellationToken: cancellationToken);
         if (user == null)
@@ -162,7 +160,7 @@ public class UserHandler(AuthContext authContext)
     {
         try
         {
-             await EnsureAuthenticated(authContext);
+             await EnsureAuthenticated();
 
             var existingRole = await db.Roles
                 .FirstOrDefaultAsync(r => r.Name == command.Input.Name, cancellationToken);
@@ -203,7 +201,7 @@ public class UserHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var role = await db.Roles.FindAsync([command.Id], cancellationToken);
             if (role == null)
@@ -241,7 +239,7 @@ public class UserHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var role = await db.Roles
                 .Include(r => r.Users)
@@ -273,7 +271,7 @@ public class UserHandler(AuthContext authContext)
         try
         {
              
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var role = await db.Roles
                 .Include(r => r.RolePermissions)
@@ -312,7 +310,7 @@ public class UserHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
             
             var permissionsToRemove = await db.RolePermissions
                 .Where(rp => rp.RoleId == command.Input.RoleId &&

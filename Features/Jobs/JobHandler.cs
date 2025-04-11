@@ -9,7 +9,7 @@ namespace Axon_Job_App.Features.Jobs;
 
 public class JobHandler(AuthContext authContext)
 {
-    public async Task EnsureAuthenticated(AuthContext authContext)
+       private async Task EnsureAuthenticated()
     {
         if (!await Task.FromResult(authContext.IsAuthenticated()))
         {
@@ -43,7 +43,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             if (!await db.Clients.AnyAsync(c => c.Id == command.Input.ClientId, ct))
                 return CallResult<JobResponse>.error("Client not found");
@@ -81,7 +81,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var job = await db.Jobs.FindAsync([command.Id], ct);
             if (job == null)
@@ -142,7 +142,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             // Check existence and assignments in single query
             var jobInfo = await db.Jobs
@@ -176,7 +176,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var updated = await db.Jobs
                 .Where(j => j.Id == command.Id)
@@ -203,7 +203,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var job = await db.Jobs
                 .Include(j => j.Assignments)
@@ -243,7 +243,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var assignment = await db.JobAssignments
                 .FirstOrDefaultAsync(a => 
@@ -268,7 +268,7 @@ public class JobHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var assignment = await db.JobAssignments
                 .FirstOrDefaultAsync(a => 

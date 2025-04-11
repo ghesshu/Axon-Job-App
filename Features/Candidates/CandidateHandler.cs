@@ -11,7 +11,7 @@ namespace Axon_Job_App.Features.Candidates;
 
 public class CandidateHandler(AuthContext authContext)
 {
-    public async Task EnsureAuthenticated(AuthContext authContext)
+       private async Task EnsureAuthenticated()
     {
         if (!await Task.FromResult(authContext.IsAuthenticated()))
         {
@@ -25,7 +25,7 @@ public class CandidateHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var existingCandidate = await db.Candidates
                 .FirstOrDefaultAsync(c => c.Email == command.Input.Email, ct);
@@ -70,7 +70,7 @@ public class CandidateHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var candidate = await db.Candidates.FindAsync([command.Id], ct);
             if (candidate == null)
@@ -119,7 +119,7 @@ public class CandidateHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var candidate = await db.Candidates
                 .Include(c => c.Assignments)
@@ -166,7 +166,7 @@ public class CandidateHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
 
             var candidate = await db.Candidates.FindAsync([command.Id], ct);
             if (candidate == null)
@@ -191,7 +191,7 @@ public class CandidateHandler(AuthContext authContext)
     {
         try
         {
-            await EnsureAuthenticated(authContext);
+            await EnsureAuthenticated();
             
             var candidateExists = await db.Candidates.AnyAsync(c => c.Id == command.CandidateId, ct);
             if (!candidateExists)
