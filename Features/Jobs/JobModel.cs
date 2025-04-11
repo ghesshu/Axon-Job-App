@@ -88,7 +88,7 @@ public class Job : IHasTimestamps
 
 public class JobAssignment
 {
-    [Key]
+    public long Id { get; set; }
     public long JobId { get; set; }
     public virtual Job Job { get; set; } = null!;
 

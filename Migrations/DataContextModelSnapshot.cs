@@ -211,7 +211,7 @@ namespace Axon_Job_App.Migrations
 
             modelBuilder.Entity("Axon_Job_App.Data.JobAssignment", b =>
                 {
-                    b.Property<long>("JobId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -221,17 +221,17 @@ namespace Axon_Job_App.Migrations
                     b.Property<long>("CandidateId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("JobId1")
+                    b.Property<long>("JobId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
                         .HasColumnType("varchar(20)");
 
-                    b.HasKey("JobId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CandidateId");
 
-                    b.HasIndex("JobId1");
+                    b.HasIndex("JobId");
 
                     b.ToTable("JobAssignments");
                 });
@@ -364,7 +364,7 @@ namespace Axon_Job_App.Migrations
 
                     b.HasOne("Axon_Job_App.Data.Job", "Job")
                         .WithMany("Assignments")
-                        .HasForeignKey("JobId1")
+                        .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

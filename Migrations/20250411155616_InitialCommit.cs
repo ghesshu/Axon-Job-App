@@ -38,11 +38,21 @@ namespace Axon_Job_App.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     CompanyName = table.Column<string>(type: "TEXT", nullable: false),
-                    CompanyImage = table.Column<string>(type: "TEXT", nullable: true),
+                    CeoFirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    CeoLastName = table.Column<string>(type: "TEXT", nullable: false),
+                    JobTitle = table.Column<string>(type: "TEXT", nullable: true),
+                    CompanyEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    CompanyPhone = table.Column<string>(type: "TEXT", nullable: false),
+                    CompanyAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    PostalCode = table.Column<string>(type: "TEXT", nullable: false),
+                    RegistrationNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Website = table.Column<string>(type: "TEXT", nullable: true),
+                    LinkedIn = table.Column<string>(type: "TEXT", nullable: true),
+                    LocationCoordinates = table.Column<string>(type: "TEXT", nullable: true),
+                    CompanyLogo = table.Column<string>(type: "TEXT", nullable: true),
                     CompanyLocation = table.Column<string>(type: "TEXT", nullable: false),
                     DateJoined = table.Column<DateTime>(type: "TEXT", nullable: false),
                     VerificationStatus = table.Column<string>(type: "varchar(20)", nullable: false),
-                    NumberOfAttendingCandidates = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -87,20 +97,18 @@ namespace Axon_Job_App.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ClientId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", nullable: false),
-                    TemporaryType = table.Column<string>(type: "TEXT", nullable: true),
+                    Title = table.Column<string>(type: "varchar(120)", nullable: false),
                     JobType = table.Column<string>(type: "varchar(20)", nullable: false),
                     Status = table.Column<string>(type: "varchar(20)", nullable: false),
                     PaymentType = table.Column<string>(type: "varchar(20)", nullable: false),
-                    PaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SalaryPerAnnum = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Duties = table.Column<string>(type: "text[]", nullable: false),
                     Requirements = table.Column<string>(type: "text[]", nullable: false),
-                    JobHours = table.Column<string>(type: "TEXT", nullable: false),
-                    Location = table.Column<string>(type: "TEXT", nullable: false),
-                    Published = table.Column<bool>(type: "INTEGER", nullable: false),
+                    JobHours = table.Column<string>(type: "varchar(20)", nullable: false),
+                    Location = table.Column<string>(type: "varchar(120)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     NumberOfRoles = table.Column<int>(type: "INTEGER", nullable: false),
-                    WorkingHours = table.Column<string>(type: "TEXT", nullable: true),
+                    Published = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -119,12 +127,14 @@ namespace Axon_Job_App.Migrations
                 name: "RolePermissions",
                 columns: table => new
                 {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     RoleId = table.Column<long>(type: "INTEGER", nullable: false),
                     PermissionName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionName });
+                    table.PrimaryKey("PK_RolePermissions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RolePermissions_Permissions_PermissionName",
                         column: x => x.PermissionName,
@@ -166,14 +176,16 @@ namespace Axon_Job_App.Migrations
                 name: "JobAssignments",
                 columns: table => new
                 {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     JobId = table.Column<long>(type: "INTEGER", nullable: false),
                     CandidateId = table.Column<long>(type: "INTEGER", nullable: false),
                     AssignedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "varchar(20)", nullable: false)
+                    Status = table.Column<int>(type: "varchar(20)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobAssignments", x => new { x.JobId, x.CandidateId });
+                    table.PrimaryKey("PK_JobAssignments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_JobAssignments_Candidates_CandidateId",
                         column: x => x.CandidateId,
@@ -194,6 +206,11 @@ namespace Axon_Job_App.Migrations
                 column: "CandidateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobAssignments_JobId",
+                table: "JobAssignments",
+                column: "JobId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Jobs_ClientId",
                 table: "Jobs",
                 column: "ClientId");
@@ -202,6 +219,11 @@ namespace Axon_Job_App.Migrations
                 name: "IX_RolePermissions_PermissionName",
                 table: "RolePermissions",
                 column: "PermissionName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_RoleId",
+                table: "RolePermissions",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
