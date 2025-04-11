@@ -3,6 +3,7 @@ using Axon_Job_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Axon_Job_App.Features.Clients;
 using Axon_Job_App.Services;
+using HotChocolate.Subscriptions;
 
 
 namespace Axon_Job_App.Features.Jobs;
@@ -38,6 +39,7 @@ public class JobHandler(AuthContext authContext)
     public async Task<CallResult<JobResponse>> Handle(
         JobMutation.CreateJob command, 
         DataContext db, 
+        [Service] ITopicEventSender topicEventSender,
         CancellationToken ct)
     {
         try
@@ -65,7 +67,11 @@ public class JobHandler(AuthContext authContext)
             await db.Jobs.AddAsync(job, ct);
             await db.SaveChangesAsync(ct);
 
-            return CallResult<JobResponse>.ok(MapToResponse(job), "Job created successfully");
+            var res = MapToResponse(job);
+
+            await topicEventSender.SendAsync("JobCreated", res, ct);
+
+            return CallResult<JobResponse>.ok(res, "Job created successfully");
         }
         catch (Exception e)
         {
@@ -76,6 +82,7 @@ public class JobHandler(AuthContext authContext)
     public async Task<CallResult<JobResponse>> Handle(
         JobMutation.UpdateJob command, 
         DataContext db, 
+        [Service] ITopicEventSender topicEventSender,
         CancellationToken ct)
     {
         try
@@ -126,7 +133,12 @@ public class JobHandler(AuthContext authContext)
             job.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(ct);
 
-            return CallResult<JobResponse>.ok(MapToResponse(job), "Job updated successfully");
+             var res = MapToResponse(job);
+        
+            // Publish to the dynamic subscription topic for this specific job
+            await topicEventSender.SendAsync($"jobUpdated_{job.Id}", res, ct);
+
+            return CallResult<JobResponse>.ok(res, "Job updated successfully");
         }
         catch (Exception e)
         {
