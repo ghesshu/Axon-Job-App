@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Axon_Job_App.Features.Candidates;
-
+using Axon_Job_App.Features.Clients;
 using Axon_Job_App.Helpers;
 
 namespace Axon_Job_App.Features.Jobs;
@@ -14,9 +14,10 @@ public class Job : IHasTimestamps
     [ForeignKey(nameof(Client))]
     public long ClientId { get; set; }
 
-    public virtual Axon_Job_App.Features.Clients.Client Client { get; set; } = null!;
+    public virtual Client Client { get; set; } = null!;
 
     [Required]
+    [Column(TypeName = "varchar(120)")]
     public string Title { get; set; } = null!;
 
     [Required]
@@ -43,9 +44,11 @@ public class Job : IHasTimestamps
     public string[] Requirements { get; set; } = new string[4];  // Array of 4 requirements
 
     [Required]
+    [Column(TypeName = "varchar(20)")]
     public string JobHours { get; set; } = null!;
 
     [Required]
+    [Column(TypeName = "varchar(120)")]
     public string Location { get; set; } = null!;
 
     [Required]
