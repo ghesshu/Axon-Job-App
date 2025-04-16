@@ -39,6 +39,7 @@ public record CreateClientRequest(
     string? LocationCoordinates,
     string? CompanyLogo,
     string CompanyLocation,
+    IFile? LogoImg,
     VerificationStatus VerificationStatus = VerificationStatus.Pending
 );
 
@@ -56,7 +57,8 @@ public record UpdateClientRequest(
     string? LinkedIn,
     string? LocationCoordinates,
     string? CompanyLogo,
-    string? CompanyLocation
+    string? CompanyLocation,
+    IFile? LogoImg
 );
 
 public enum VerificationStatus

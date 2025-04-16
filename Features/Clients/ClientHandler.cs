@@ -46,8 +46,15 @@ public class ClientHandler(AuthContext authContext)
                 LocationCoordinates = command.Input.LocationCoordinates,
                 CompanyLogo = command.Input.CompanyLogo,
                 CompanyLocation = command.Input.CompanyLocation,
-                VerificationStatus = command.Input.VerificationStatus.ToString()
+                VerificationStatus = command.Input.VerificationStatus.ToString(),
             };
+            
+            if (command.Input.LogoImg != null)
+            {
+                using var ms = new MemoryStream();
+                await command.Input.LogoImg.CopyToAsync(ms, cancellationToken);
+                client.SetLogoData(Convert.ToBase64String(ms.ToArray()), command.Input.LogoImg.ContentType);
+            }
 
             // Use AddAsync for better async performance
             await db.Clients.AddAsync(client, cancellationToken);
@@ -75,6 +82,13 @@ public class ClientHandler(AuthContext authContext)
 
             // Use pattern matching for cleaner null checks
             UpdateClientProperties(client, command.Input);
+            
+            if (command.Input.CompanyLogo != null)
+            {
+                using var ms = new MemoryStream();
+                await command.Input.LogoImg.CopyToAsync(ms, cancellationToken);
+                client.SetLogoData(Convert.ToBase64String(ms.ToArray()), command.Input.LogoImg.ContentType);
+            }
 
             client.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(cancellationToken);

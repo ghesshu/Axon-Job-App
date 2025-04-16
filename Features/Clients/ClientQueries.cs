@@ -21,5 +21,4 @@ public partial class ClientQueries
         }
         return db.Clients.AsQueryable();
     }
-
 }

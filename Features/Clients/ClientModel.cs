@@ -53,6 +53,7 @@ public class Client : IHasTimestamps
     public string? LocationCoordinates { get; set; }
 
     public string? CompanyLogo { get; set; }
+    
 
     [Required]
     public string CompanyLocation { get; set; } = null!;
@@ -67,6 +68,15 @@ public class Client : IHasTimestamps
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public string? LogoBase64 { get; set; }
+    public string? LogoMimeType { get; set; }
+
+    public void SetLogoData(string base64, string? mimeType)
+    {
+        LogoBase64 = base64;
+        LogoMimeType = mimeType;
+    }
 
     public class TypeConfiguration : IEntityTypeConfiguration<Client>
     {
